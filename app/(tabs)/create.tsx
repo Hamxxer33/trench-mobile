@@ -13,36 +13,76 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { TrenchBaseLockup } from '@/components/TrenchBaseLockup';
 import { useWallet } from '@/components/WalletContext';
 import { colors, radius, spacing, typography } from '@/theme';
 
-type Step = 1 | 2 | 3;
+type Step = 1 | 2 | 3 | 4 | 5;
+
+const STEP_LABELS = ['Basics', 'Art', 'Socials', 'Review', 'Sign'] as const;
 
 /** Figma lock: first-buy is optional and defaults OFF. Cap stub amount. */
 const FIRST_BUY_CAP_ETH = 0.1;
 
+/** Mock square art presets (placeholder until real upload). */
+const ART_PRESETS = [
+  { id: 'ape', label: 'Ape', emoji: '🦍', tint: '#0000FF' },
+  { id: 'rocket', label: 'Rocket', emoji: '🚀', tint: '#4D4DFF' },
+  { id: 'trench', label: 'Trench', emoji: '🪖', tint: '#32353D' },
+  { id: 'base', label: 'Base', emoji: '🔵', tint: '#0000CC' },
+] as const;
+
+type ArtPresetId = (typeof ART_PRESETS)[number]['id'] | 'upload';
+
 export default function CreateLaunchScreen() {
-  const { wallet } = useWallet();
+  const { wallet, connecting, connect } = useWallet();
   const [step, setStep] = useState<Step>(1);
   const [name, setName] = useState('');
   const [symbol, setSymbol] = useState('');
   const [description, setDescription] = useState('');
+  const [artId, setArtId] = useState<ArtPresetId | null>(null);
+  const [twitter, setTwitter] = useState('');
+  const [telegram, setTelegram] = useState('');
+  const [website, setWebsite] = useState('');
   /** Optional first-buy — default OFF (Figma lock). */
   const [firstBuyEnabled, setFirstBuyEnabled] = useState(false);
   const [firstBuyAmount, setFirstBuyAmount] = useState('0.01');
 
+  const selectedArt =
+    artId === 'upload'
+      ? { id: 'upload' as const, label: 'Uploaded', emoji: '🖼️', tint: colors.baseBlue }
+      : ART_PRESETS.find((p) => p.id === artId) ?? null;
+
   const canNext =
-    (step === 1 && name.trim().length >= 2 && symbol.trim().length >= 2) ||
-    (step === 2 && description.trim().length >= 8) ||
-    step === 3;
+    (step === 1 &&
+      name.trim().length >= 2 &&
+      symbol.trim().length >= 2 &&
+      description.trim().length >= 8) ||
+    (step === 2 && artId !== null) ||
+    step === 3 ||
+    step === 4 ||
+    step === 5;
 
   const clampFirstBuy = (raw: string) => {
     setFirstBuyAmount(raw);
   };
 
+  const resetForm = () => {
+    setStep(1);
+    setName('');
+    setSymbol('');
+    setDescription('');
+    setArtId(null);
+    setTwitter('');
+    setTelegram('');
+    setWebsite('');
+    setFirstBuyEnabled(false);
+    setFirstBuyAmount('0.01');
+  };
+
   const onLaunch = () => {
     if (!wallet) {
-      Alert.alert('Connect wallet', 'Use the Wallet tab to connect a mock wallet first.');
+      Alert.alert('Sign in with Base', 'Connect on the Sign step (or Wallet tab) first.');
       return;
     }
 
@@ -63,16 +103,24 @@ export default function CreateLaunchScreen() {
       buyLine = `First buy: ${value} ETH (mock)`;
     }
 
+    const socialBits = [
+      twitter.trim() && `X: @${twitter.trim().replace(/^@/, '')}`,
+      telegram.trim() && `TG: ${telegram.trim()}`,
+      website.trim() && `Web: ${website.trim()}`,
+    ].filter(Boolean);
+
     Alert.alert(
       'Launch queued (mock)',
-      `${name} ($${symbol.toUpperCase()})\n${buyLine}\n\nMock trade — no chain.`,
+      `${name} ($${symbol.toUpperCase()})\nArt: ${selectedArt?.label ?? '—'}\n${buyLine}${
+        socialBits.length ? `\n${socialBits.join(' · ')}` : ''
+      }\n\nMock trade — no chain.`,
     );
-    setStep(1);
-    setName('');
-    setSymbol('');
-    setDescription('');
-    setFirstBuyEnabled(false);
-    setFirstBuyAmount('0.01');
+    resetForm();
+  };
+
+  const onMockUpload = () => {
+    setArtId('upload');
+    Alert.alert('Upload (mock)', '512² placeholder attached. No real file picker in V1.');
   };
 
   return (
@@ -81,11 +129,14 @@ export default function CreateLaunchScreen() {
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+          <TrenchBaseLockup size="sm" style={styles.lockup} />
           <Text style={styles.title}>Create coin</Text>
-          <Text style={styles.subtitle}>Multi-step wizard · mock only</Text>
+          <Text style={styles.subtitle}>
+            {STEP_LABELS[step - 1]} · step {step}/5 · mock only
+          </Text>
 
           <View style={styles.steps}>
-            {([1, 2, 3] as Step[]).map((s) => (
+            {([1, 2, 3, 4, 5] as Step[]).map((s) => (
               <View key={s} style={[styles.stepDot, step >= s && styles.stepDotActive]}>
                 <Text style={styles.stepDotText}>{s}</Text>
               </View>
@@ -111,11 +162,6 @@ export default function CreateLaunchScreen() {
                 autoCapitalize="characters"
                 placeholderTextColor={colors.textMuted}
               />
-            </View>
-          )}
-
-          {step === 2 && (
-            <View style={styles.card}>
               <Text style={styles.label}>Description</Text>
               <TextInput
                 style={[styles.input, styles.textarea]}
@@ -129,7 +175,103 @@ export default function CreateLaunchScreen() {
             </View>
           )}
 
+          {step === 2 && (
+            <View style={styles.card}>
+              <Text style={styles.labelTight}>Coin art (512²)</Text>
+              <Text style={styles.toggleHint}>
+                Pick a mock preset or upload a placeholder · crop preview stub
+              </Text>
+
+              <View style={styles.artPreview}>
+                {selectedArt ? (
+                  <View style={[styles.artSquare, { backgroundColor: selectedArt.tint }]}>
+                    <Text style={styles.artEmoji}>{selectedArt.emoji}</Text>
+                  </View>
+                ) : (
+                  <View style={[styles.artSquare, styles.artSquareEmpty]}>
+                    <Text style={styles.artPlaceholder}>512²</Text>
+                  </View>
+                )}
+                <Text style={styles.artCaption}>
+                  {selectedArt ? selectedArt.label : 'No art selected'}
+                </Text>
+              </View>
+
+              <View style={styles.artGrid}>
+                {ART_PRESETS.map((preset) => {
+                  const active = artId === preset.id;
+                  return (
+                    <Pressable
+                      key={preset.id}
+                      onPress={() => setArtId(preset.id)}
+                      style={({ pressed }) => [
+                        styles.artChip,
+                        active && styles.artChipActive,
+                        pressed && { opacity: 0.85 },
+                      ]}>
+                      <Text style={styles.artChipEmoji}>{preset.emoji}</Text>
+                      <Text style={[styles.artChipLabel, active && styles.artChipLabelActive]}>
+                        {preset.label}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+
+              <Pressable
+                onPress={onMockUpload}
+                style={({ pressed }) => [
+                  styles.uploadBtn,
+                  artId === 'upload' && styles.uploadBtnActive,
+                  pressed && { opacity: 0.85 },
+                ]}>
+                <Text style={styles.uploadBtnText}>
+                  {artId === 'upload' ? 'Uploaded (mock)' : 'Upload image (mock)'}
+                </Text>
+              </Pressable>
+            </View>
+          )}
+
           {step === 3 && (
+            <View style={styles.card}>
+              <Text style={styles.labelTight}>Socials (optional)</Text>
+              <Text style={styles.toggleHint}>Skip anytime — placeholders only</Text>
+
+              <Text style={styles.label}>X / Twitter</Text>
+              <TextInput
+                style={styles.input}
+                value={twitter}
+                onChangeText={setTwitter}
+                placeholder="@handle"
+                placeholderTextColor={colors.textMuted}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+              <Text style={styles.label}>Telegram</Text>
+              <TextInput
+                style={styles.input}
+                value={telegram}
+                onChangeText={setTelegram}
+                placeholder="t.me/…"
+                placeholderTextColor={colors.textMuted}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+              <Text style={styles.label}>Website</Text>
+              <TextInput
+                style={styles.input}
+                value={website}
+                onChangeText={setWebsite}
+                placeholder="https://"
+                placeholderTextColor={colors.textMuted}
+                autoCapitalize="none"
+                autoCorrect={false}
+                keyboardType="url"
+              />
+            </View>
+          )}
+
+          {step === 4 && (
             <View style={styles.card}>
               <View style={styles.toggleRow}>
                 <View style={styles.toggleCopy}>
@@ -163,11 +305,33 @@ export default function CreateLaunchScreen() {
 
               <View style={styles.summary}>
                 <Text style={styles.summaryTitle}>Review</Text>
+                <View style={styles.summaryArtRow}>
+                  {selectedArt && (
+                    <View
+                      style={[
+                        styles.summaryArt,
+                        { backgroundColor: selectedArt.tint },
+                      ]}>
+                      <Text style={styles.summaryArtEmoji}>{selectedArt.emoji}</Text>
+                    </View>
+                  )}
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.summaryLine}>
+                      {name || '—'} · ${symbol || '—'}
+                    </Text>
+                    <Text style={styles.summaryLine} numberOfLines={2}>
+                      {description || '—'}
+                    </Text>
+                  </View>
+                </View>
                 <Text style={styles.summaryLine}>
-                  {name || '—'} · ${symbol || '—'}
+                  Art: {selectedArt?.label ?? '—'}
                 </Text>
-                <Text style={styles.summaryLine} numberOfLines={3}>
-                  {description || '—'}
+                <Text style={styles.summaryLine}>
+                  Socials:{' '}
+                  {[twitter && `X`, telegram && `TG`, website && `Web`]
+                    .filter(Boolean)
+                    .join(' · ') || 'none'}
                 </Text>
                 <Text style={styles.summaryLine}>
                   First buy: {firstBuyEnabled ? `${firstBuyAmount} ETH` : 'off'}
@@ -179,6 +343,46 @@ export default function CreateLaunchScreen() {
             </View>
           )}
 
+          {step === 5 && (
+            <View style={styles.card}>
+              <Text style={styles.labelTight}>Sign</Text>
+              <Text style={styles.toggleHint}>
+                Sign in with Base / passkey stub → create (mock live)
+              </Text>
+
+              {wallet ? (
+                <>
+                  <View style={styles.signedBadge}>
+                    <Text style={styles.signedBadgeText}>Signed in with Base (mock)</Text>
+                  </View>
+                  <Text style={styles.summaryLine}>
+                    Ready to launch {name || '—'} (${symbol || '—'})
+                  </Text>
+                </>
+              ) : (
+                <>
+                  <Text style={styles.hint}>
+                    Connect before create. Fake Sign in with Base only — no chain.
+                  </Text>
+                  <Pressable
+                    disabled={connecting}
+                    onPress={() => connect()}
+                    accessibilityRole="button"
+                    accessibilityLabel="Sign in with Base"
+                    style={({ pressed }) => [
+                      styles.primary,
+                      pressed && { opacity: 0.85 },
+                      connecting && { opacity: 0.6 },
+                    ]}>
+                    <Text style={styles.primaryText}>
+                      {connecting ? 'Connecting…' : 'Sign in with Base'}
+                    </Text>
+                  </Pressable>
+                </>
+              )}
+            </View>
+          )}
+
           <View style={styles.actions}>
             {step > 1 && (
               <Pressable
@@ -187,7 +391,7 @@ export default function CreateLaunchScreen() {
                 <Text style={styles.secondaryText}>Back</Text>
               </Pressable>
             )}
-            {step < 3 ? (
+            {step < 5 ? (
               <Pressable
                 disabled={!canNext}
                 onPress={() => setStep((s) => (s + 1) as Step)}
@@ -200,8 +404,13 @@ export default function CreateLaunchScreen() {
               </Pressable>
             ) : (
               <Pressable
+                disabled={!wallet}
                 onPress={onLaunch}
-                style={({ pressed }) => [styles.primary, pressed && { opacity: 0.85 }]}>
+                style={({ pressed }) => [
+                  styles.primary,
+                  !wallet && styles.disabled,
+                  pressed && wallet && { opacity: 0.85 },
+                ]}>
                 <Text style={styles.primaryText}>Create coin (mock)</Text>
               </Pressable>
             )}
@@ -215,6 +424,7 @@ export default function CreateLaunchScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   content: { padding: spacing.lg, paddingBottom: spacing.xxl },
+  lockup: { marginBottom: spacing.sm },
   title: { ...typography.title, color: colors.text },
   subtitle: { color: colors.textMuted, marginBottom: spacing.lg },
   steps: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.lg },
@@ -249,6 +459,7 @@ const styles = StyleSheet.create({
   },
   toggleCopy: { flex: 1, gap: 2 },
   toggleHint: { color: colors.textMuted, fontSize: 12 },
+  hint: { color: colors.textMuted, marginBottom: spacing.sm },
   input: {
     backgroundColor: colors.surfaceElevated,
     borderRadius: radius.md,
@@ -260,6 +471,53 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   textarea: { minHeight: 100, textAlignVertical: 'top' },
+  artPreview: { alignItems: 'center', gap: spacing.sm, marginVertical: spacing.sm },
+  artSquare: {
+    width: 128,
+    height: 128,
+    borderRadius: radius.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  artSquareEmpty: { backgroundColor: colors.surfaceElevated },
+  artEmoji: { fontSize: 48 },
+  artPlaceholder: { color: colors.textMuted, fontWeight: '700', fontSize: 18 },
+  artCaption: { color: colors.textSecondary, fontSize: 13 },
+  artGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+  },
+  artChip: {
+    width: '47%',
+    flexGrow: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingVertical: 12,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceElevated,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  artChipActive: { borderColor: colors.baseBlue, backgroundColor: colors.baseBlueDark },
+  artChipEmoji: { fontSize: 20 },
+  artChipLabel: { color: colors.textSecondary, fontWeight: '600' },
+  artChipLabelActive: { color: colors.white },
+  uploadBtn: {
+    marginTop: spacing.sm,
+    paddingVertical: 12,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.baseBlue,
+    borderStyle: 'dashed',
+    alignItems: 'center',
+  },
+  uploadBtnActive: { backgroundColor: colors.baseBlueDark, borderStyle: 'solid' },
+  uploadBtnText: { color: colors.baseBlueLight, fontWeight: '600' },
   summary: {
     marginTop: spacing.md,
     padding: spacing.md,
@@ -268,8 +526,26 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   summaryTitle: { color: colors.baseBlueLight, fontWeight: '700' },
+  summaryArtRow: { flexDirection: 'row', gap: spacing.md, alignItems: 'center' },
+  summaryArt: {
+    width: 48,
+    height: 48,
+    borderRadius: radius.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  summaryArtEmoji: { fontSize: 22 },
   summaryLine: { color: colors.textSecondary },
   warn: { color: colors.warning, fontSize: 12, marginTop: 6 },
+  signedBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: colors.baseBlueDark,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: radius.full,
+    marginVertical: spacing.sm,
+  },
+  signedBadgeText: { color: colors.white, fontSize: 12, fontWeight: '700' },
   actions: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.lg },
   primary: {
     flex: 1,

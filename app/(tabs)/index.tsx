@@ -3,8 +3,9 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CoinCard } from '@/components/CoinCard';
+import { TrenchBaseLockup } from '@/components/TrenchBaseLockup';
 import { getNew, getTrending } from '@/data/mocks/launches';
-import { colors, spacing, typography } from '@/theme';
+import { colors, spacing } from '@/theme';
 
 type FeedTab = 'trending' | 'new';
 
@@ -15,7 +16,7 @@ export default function HomeFeedScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
-        <Text style={styles.brand}>TRENCH</Text>
+        <TrenchBaseLockup />
         <Text style={styles.subtitle}>Base-native B20 launchpad · mock V1</Text>
       </View>
 
@@ -48,7 +49,6 @@ export default function HomeFeedScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   header: { paddingHorizontal: spacing.lg, paddingTop: spacing.md, paddingBottom: spacing.sm },
-  brand: { ...typography.title, color: colors.baseBlueLight, letterSpacing: 2 },
   subtitle: { color: colors.textMuted, marginTop: 4, fontSize: 13 },
   tabs: {
     flexDirection: 'row',

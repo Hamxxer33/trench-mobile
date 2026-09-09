@@ -1,6 +1,7 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { BuiltOnBaseFooter, TrenchBaseLockup } from '@/components/TrenchBaseLockup';
 import { useWallet } from '@/components/WalletContext';
 import { shortenAddress } from '@/data/mocks/wallet';
 import { colors, radius, spacing, typography } from '@/theme';
@@ -11,6 +12,7 @@ export default function WalletScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.content}>
+        <TrenchBaseLockup size="sm" style={styles.lockup} />
         <Text style={styles.title}>Wallet</Text>
         <Text style={styles.subtitle}>
           Sign in with Base stub — no WalletConnect / wagmi / real chain.
@@ -52,6 +54,8 @@ export default function WalletScreen() {
             </Pressable>
           </View>
         )}
+
+        <BuiltOnBaseFooter style={styles.footer} />
       </View>
     </SafeAreaView>
   );
@@ -59,7 +63,8 @@ export default function WalletScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.lg },
+  content: { flex: 1, padding: spacing.lg },
+  lockup: { marginBottom: spacing.sm },
   title: { ...typography.title, color: colors.text },
   subtitle: { color: colors.textMuted, marginBottom: spacing.lg },
   card: {
@@ -104,4 +109,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   secondaryText: { color: colors.text, fontWeight: '600' },
+  footer: { marginTop: 'auto' as const, paddingBottom: spacing.md },
 });
