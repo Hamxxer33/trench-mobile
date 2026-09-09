@@ -7,7 +7,7 @@ export const colors = {
   /** Base Gray — surfaces / elevated chrome */
   baseGray: '#32353D',
   background: '#0A0B0D',
-  surface: '#32353D', // between canvas and Base Gray; soft Figma nit
+  surface: '#32353D',
   surfaceElevated: '#32353D',
   border: '#32353D',
   text: '#F5F7FA',
