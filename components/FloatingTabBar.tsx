@@ -16,9 +16,9 @@ const TAB_ICONS = {
     web: 'local_fire_department',
   },
   live: {
-    ios: 'video.fill',
-    android: 'videocam',
-    web: 'videocam',
+    ios: 'person.3.fill',
+    android: 'groups',
+    web: 'groups',
   },
   create: {
     ios: 'plus.circle.fill',
@@ -41,7 +41,7 @@ type RouteName = keyof typeof TAB_ICONS;
 
 /**
  * Floating frosted pill tab bar — active = white square behind icon.
- * No rainbow glow. IA locked: Feed | Live | Create | Portfolio | Wallet.
+ * No rainbow glow. IA locked: Feed | Groups | Create | Portfolio | Wallet.
  */
 export function FloatingTabBar({ state, descriptors, navigation }: TabBarProps) {
   const insets = useSafeAreaInsets();

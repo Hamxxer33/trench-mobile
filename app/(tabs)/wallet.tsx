@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -10,6 +11,7 @@ import { colors, radius, spacing, tabBar, typography } from '@/theme';
 
 export default function WalletScreen() {
   const { wallet, disconnect } = useWallet();
+  const router = useRouter();
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -46,6 +48,18 @@ export default function WalletScreen() {
         )}
 
         <FeeSplitChrome style={styles.fee} />
+
+        <GlassSurface intensity={40} borderRadius={radius.lg} contentStyle={styles.settingsCard}>
+          <Text style={styles.settingsTitle}>Settings & legal</Text>
+          <Text style={styles.hint}>Terms · Privacy · Risk · Licenses</Text>
+          <Pressable
+            onPress={() => router.push('/settings')}
+            accessibilityRole="button"
+            accessibilityLabel="Open settings"
+            style={({ pressed }) => [styles.settingsBtn, pressed && { opacity: 0.85 }]}>
+            <Text style={styles.settingsBtnText}>Open settings</Text>
+          </Pressable>
+        </GlassSurface>
 
         <BuiltOnBaseFooter style={styles.footer} />
       </ScrollView>
@@ -94,5 +108,15 @@ const styles = StyleSheet.create({
   },
   secondaryText: { color: colors.text, fontWeight: '600' },
   fee: { marginTop: spacing.xs },
+  settingsCard: { padding: spacing.lg, gap: spacing.sm },
+  settingsTitle: { color: colors.text, fontSize: 16, fontWeight: '700' },
+  settingsBtn: {
+    marginTop: spacing.sm,
+    backgroundColor: colors.baseBlue,
+    paddingVertical: 12,
+    borderRadius: radius.md,
+    alignItems: 'center',
+  },
+  settingsBtnText: { color: colors.white, fontWeight: '700' },
   footer: { marginTop: spacing.md, paddingBottom: spacing.md },
 });

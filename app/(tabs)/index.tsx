@@ -3,7 +3,9 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CoinCard } from '@/components/CoinCard';
+import { MembersFirstBanner } from '@/components/MembersFirstBanner';
 import { TrenchBaseLockup } from '@/components/TrenchBaseLockup';
+import { getMembersFirstLaunches } from '@/data/mocks/groups';
 import { getNew, getTrending } from '@/data/mocks/launches';
 import { colors, spacing, tabBar } from '@/theme';
 
@@ -12,12 +14,15 @@ type FeedTab = 'trending' | 'new';
 export default function HomeFeedScreen() {
   const [tab, setTab] = useState<FeedTab>('trending');
   const data = useMemo(() => (tab === 'trending' ? getTrending() : getNew()), [tab]);
+  const membersFirst = useMemo(() => getMembersFirstLaunches(), []);
+  const pinnedIds = useMemo(() => new Set(membersFirst.map((m) => m.launch.id)), [membersFirst]);
+  const feedData = useMemo(() => data.filter((l) => !pinnedIds.has(l.id)), [data, pinnedIds]);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <TrenchBaseLockup />
-        <Text style={styles.subtitle}>Trench × Base · one-sided LP / pool · mock V1.1</Text>
+        <Text style={styles.subtitle}>Trench × Base · one-sided LP / pool · mock V1.2</Text>
       </View>
 
       <View style={styles.tabs}>
@@ -36,11 +41,25 @@ export default function HomeFeedScreen() {
       </View>
 
       <FlatList
-        data={data}
+        data={feedData}
         keyExtractor={(item) => item.id}
         numColumns={2}
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.list}
+        ListHeaderComponent={
+          membersFirst.length > 0 ? (
+            <View>
+              {membersFirst.map(({ launch, group }) => (
+                <MembersFirstBanner
+                  key={launch.id}
+                  variant="feed"
+                  launch={launch}
+                  group={group}
+                />
+              ))}
+            </View>
+          ) : null
+        }
         renderItem={({ item }) => <CoinCard launch={item} compact />}
         ListEmptyComponent={<Text style={styles.empty}>No launches yet.</Text>}
       />

@@ -30,23 +30,32 @@ const trenchTheme = {
   },
 };
 
-/** Gate unsigned users to /login; bounce signed-in users off login → Feed. */
+const PUBLIC_SEGMENTS = new Set(['login', 'legal', 'g']);
+
+/** Gate unsigned users to /login; allow legal + invite preview. */
 function AuthGate({ children }: { children: React.ReactNode }) {
   const { wallet } = useWallet();
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
-    const onLogin = segments[0] === 'login';
-    if (!wallet && !onLogin) {
+    const root = segments[0] as string | undefined;
+    const onPublic = !root || PUBLIC_SEGMENTS.has(root);
+    if (!wallet && !onPublic) {
       router.replace('/login');
-    } else if (wallet && onLogin) {
+    } else if (wallet && root === 'login') {
       router.replace('/(tabs)');
     }
   }, [wallet, segments, router]);
 
   return <>{children}</>;
 }
+
+const stackHeader = {
+  headerStyle: { backgroundColor: colors.surface },
+  headerTintColor: colors.text,
+  headerShadowVisible: false,
+};
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -75,15 +84,16 @@ export default function RootLayout() {
           <Stack>
             <Stack.Screen name="login" options={{ headerShown: false }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="coin/[id]"
-              options={{
-                title: 'Coin',
-                headerStyle: { backgroundColor: colors.surface },
-                headerTintColor: colors.text,
-                headerShadowVisible: false,
-              }}
-            />
+            <Stack.Screen name="coin/[id]" options={{ title: 'Coin', ...stackHeader }} />
+            <Stack.Screen name="groups/new" options={{ title: 'Create group', ...stackHeader }} />
+            <Stack.Screen name="groups/[id]" options={{ title: 'Group', ...stackHeader }} />
+            <Stack.Screen name="groups/join" options={{ title: 'Join', ...stackHeader }} />
+            <Stack.Screen name="g/[code]" options={{ title: 'Join group', ...stackHeader }} />
+            <Stack.Screen name="settings" options={{ title: 'Settings', ...stackHeader }} />
+            <Stack.Screen name="legal/terms" options={{ title: 'Terms', ...stackHeader }} />
+            <Stack.Screen name="legal/privacy" options={{ title: 'Privacy', ...stackHeader }} />
+            <Stack.Screen name="legal/risk" options={{ title: 'Risk', ...stackHeader }} />
+            <Stack.Screen name="legal/licenses" options={{ title: 'Licenses', ...stackHeader }} />
             <Stack.Screen name="+not-found" />
           </Stack>
         </AuthGate>

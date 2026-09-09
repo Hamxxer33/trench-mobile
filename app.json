@@ -10,7 +10,8 @@
     "ios": {
       "supportsTablet": true,
       "userInterfaceStyle": "dark",
-      "bundleIdentifier": "fun.trench.app"
+      "bundleIdentifier": "fun.trench.app",
+      "buildNumber": "1"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +22,8 @@
       },
       "predictiveBackGestureEnabled": false,
       "userInterfaceStyle": "dark",
-      "package": "fun.trench.app"
+      "package": "fun.trench.app",
+      "versionCode": 1
     },
     "web": {
       "bundler": "metro",
