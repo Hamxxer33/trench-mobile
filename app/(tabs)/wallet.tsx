@@ -2,7 +2,7 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useWallet } from '@/components/WalletContext';
-import { MOCK_WALLETS, shortenAddress } from '@/data/mocks/wallet';
+import { shortenAddress } from '@/data/mocks/wallet';
 import { colors, radius, spacing, typography } from '@/theme';
 
 export default function WalletScreen() {
@@ -13,12 +13,12 @@ export default function WalletScreen() {
       <View style={styles.content}>
         <Text style={styles.title}>Wallet</Text>
         <Text style={styles.subtitle}>
-          Stub connect flow — no WalletConnect / wagmi / real chain.
+          Sign in with Base stub — no WalletConnect / wagmi / real chain.
         </Text>
 
         {wallet ? (
           <View style={styles.card}>
-            <Text style={styles.badge}>Connected (mock)</Text>
+            <Text style={styles.badge}>Signed in with Base (mock)</Text>
             <Text style={styles.label}>{wallet.label}</Text>
             <Text style={styles.address}>{shortenAddress(wallet.address)}</Text>
             <Text style={styles.balance}>{wallet.balanceEth} ETH</Text>
@@ -31,26 +31,25 @@ export default function WalletScreen() {
         ) : (
           <View style={styles.card}>
             <Text style={styles.empty}>Not connected</Text>
-            <Text style={styles.hint}>Pick a demo wallet to unlock mock buy/sell & launch.</Text>
-            {MOCK_WALLETS.map((w) => (
-              <Pressable
-                key={w.id}
-                disabled={connecting}
-                onPress={() => connect(w.id)}
-                style={({ pressed }) => [
-                  styles.primary,
-                  pressed && { opacity: 0.85 },
-                  connecting && { opacity: 0.6 },
-                ]}>
-                {connecting ? (
-                  <ActivityIndicator color={colors.white} />
-                ) : (
-                  <Text style={styles.primaryText}>
-                    Connect {w.label}
-                  </Text>
-                )}
-              </Pressable>
-            ))}
+            <Text style={styles.hint}>
+              Sign in with Base to unlock mock buy/sell & launch. Fake connect only.
+            </Text>
+            <Pressable
+              disabled={connecting}
+              onPress={() => connect()}
+              accessibilityRole="button"
+              accessibilityLabel="Sign in with Base"
+              style={({ pressed }) => [
+                styles.primary,
+                pressed && { opacity: 0.85 },
+                connecting && { opacity: 0.6 },
+              ]}>
+              {connecting ? (
+                <ActivityIndicator color={colors.white} />
+              ) : (
+                <Text style={styles.primaryText}>Sign in with Base</Text>
+              )}
+            </Pressable>
           </View>
         )}
       </View>

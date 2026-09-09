@@ -2,7 +2,7 @@
  * Legacy Colors helper — dark-only (Figma lock).
  * Prefer `@/theme` colors in new code. No light theme.
  */
-const tintColorDark = '#3B7AFF';
+const tintColorDark = '#0000FF';
 
 export default {
   dark: {

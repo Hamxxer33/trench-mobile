@@ -2,13 +2,13 @@
 export const MOCK_WALLETS = [
   {
     id: 'mock-1',
-    label: 'Demo Wallet',
+    label: 'Base Account',
     address: '0xTr3nch0000000000000000000000000000DeM0',
     balanceEth: 1.25,
   },
   {
     id: 'mock-2',
-    label: 'Paper Trader',
+    label: 'Base Account (alt)',
     address: '0xP4p3r00000000000000000000000000000001',
     balanceEth: 0.42,
   },

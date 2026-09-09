@@ -18,7 +18,7 @@ export function BuySellPanel({ symbol, priceEth }: Props) {
 
   const onSubmit = () => {
     if (!wallet) {
-      Alert.alert('Wallet required', 'Connect a mock wallet from the Wallet tab first.');
+      Alert.alert('Wallet required', 'Sign in with Base from the Wallet tab first.');
       return;
     }
     const value = Number(amount);
