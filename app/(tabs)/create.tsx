@@ -47,6 +47,8 @@ export default function CreateLaunchScreen() {
   /** Optional first-buy — default OFF (Figma lock). */
   const [firstBuyEnabled, setFirstBuyEnabled] = useState(false);
   const [firstBuyAmount, setFirstBuyAmount] = useState('0.01');
+  /** Optional referrer code — mock only. */
+  const [referrer, setReferrer] = useState('');
 
   const selectedArt =
     artId === 'upload'
@@ -78,11 +80,12 @@ export default function CreateLaunchScreen() {
     setWebsite('');
     setFirstBuyEnabled(false);
     setFirstBuyAmount('0.01');
+    setReferrer('');
   };
 
   const onLaunch = () => {
     if (!wallet) {
-      Alert.alert('Sign in with Base', 'Connect on the Sign step (or Wallet tab) first.');
+      Alert.alert('Sign in required', 'Sign in with Privy on the Sign step (or Wallet tab) first.');
       return;
     }
 
@@ -108,10 +111,13 @@ export default function CreateLaunchScreen() {
       telegram.trim() && `TG: ${telegram.trim()}`,
       website.trim() && `Web: ${website.trim()}`,
     ].filter(Boolean);
+    const refLine = referrer.trim()
+      ? `Referrer: ${referrer.trim()}`
+      : 'Referrer: none';
 
     Alert.alert(
       'Launch queued (mock)',
-      `${name} ($${symbol.toUpperCase()})\nArt: ${selectedArt?.label ?? '—'}\n${buyLine}${
+      `${name} ($${symbol.toUpperCase()})\nArt: ${selectedArt?.label ?? '—'}\n${buyLine}\n${refLine}${
         socialBits.length ? `\n${socialBits.join(' · ')}` : ''
       }\n\nMock trade — no chain.`,
     );
@@ -268,6 +274,20 @@ export default function CreateLaunchScreen() {
                 autoCorrect={false}
                 keyboardType="url"
               />
+
+              <Text style={styles.label}>Referrer (optional)</Text>
+              <TextInput
+                style={styles.input}
+                value={referrer}
+                onChangeText={setReferrer}
+                placeholder="TRENCH-DEMO"
+                placeholderTextColor={colors.textMuted}
+                autoCapitalize="characters"
+                autoCorrect={false}
+              />
+              <Text style={styles.toggleHint}>
+                Fee-split referrer code · mock only · skip anytime
+              </Text>
             </View>
           )}
 
@@ -336,6 +356,9 @@ export default function CreateLaunchScreen() {
                 <Text style={styles.summaryLine}>
                   First buy: {firstBuyEnabled ? `${firstBuyAmount} ETH` : 'off'}
                 </Text>
+                <Text style={styles.summaryLine}>
+                  Referrer: {referrer.trim() || 'none'}
+                </Text>
                 <Text style={styles.warn}>
                   Fields are immutable after confirm (mock warning).
                 </Text>
@@ -347,35 +370,38 @@ export default function CreateLaunchScreen() {
             <View style={styles.card}>
               <Text style={styles.labelTight}>Sign</Text>
               <Text style={styles.toggleHint}>
-                Sign in with Base / passkey stub → create (mock live)
+                Sign in with Privy (mock) → create · no chain
               </Text>
 
               {wallet ? (
                 <>
                   <View style={styles.signedBadge}>
-                    <Text style={styles.signedBadgeText}>Signed in with Base (mock)</Text>
+                    <Text style={styles.signedBadgeText}>Signed in via Privy (mock)</Text>
                   </View>
                   <Text style={styles.summaryLine}>
                     Ready to launch {name || '—'} (${symbol || '—'})
                   </Text>
+                  {!!referrer.trim() && (
+                    <Text style={styles.summaryLine}>Referrer: {referrer.trim()}</Text>
+                  )}
                 </>
               ) : (
                 <>
                   <Text style={styles.hint}>
-                    Connect before create. Fake Sign in with Base only — no chain.
+                    Connect before create. Privy mock only — Google / Apple / email.
                   </Text>
                   <Pressable
                     disabled={connecting}
                     onPress={() => connect()}
                     accessibilityRole="button"
-                    accessibilityLabel="Sign in with Base"
+                    accessibilityLabel="Sign in with Privy"
                     style={({ pressed }) => [
                       styles.primary,
                       pressed && { opacity: 0.85 },
                       connecting && { opacity: 0.6 },
                     ]}>
                     <Text style={styles.primaryText}>
-                      {connecting ? 'Connecting…' : 'Sign in with Base'}
+                      {connecting ? 'Connecting…' : 'Sign in with Privy'}
                     </Text>
                   </Pressable>
                 </>

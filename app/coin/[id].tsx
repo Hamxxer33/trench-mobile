@@ -1,8 +1,9 @@
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { PoolChart } from '@/components/PoolChart';
+import { AntiSnipeBanner } from '@/components/AntiSnipeBanner';
 import { BuySellPanel } from '@/components/BuySellPanel';
+import { PoolChart } from '@/components/PoolChart';
 import { getLaunchById } from '@/data/mocks/launches';
 import { shortenAddress } from '@/data/mocks/wallet';
 import { colors, radius, spacing, typography } from '@/theme';
@@ -53,6 +54,8 @@ export default function CoinDetailScreen() {
       </View>
 
       <Text style={styles.creator}>Creator {shortenAddress(launch.creator)}</Text>
+
+      <AntiSnipeBanner progressPct={launch.progressPct} status={launch.status} />
 
       <PoolChart points={launch.chart} />
 

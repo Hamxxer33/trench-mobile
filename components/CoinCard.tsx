@@ -20,7 +20,7 @@ export function CoinCard({ launch, compact = false }: Props) {
 
   const onBuy = () => {
     if (!wallet) {
-      Alert.alert('Wallet required', 'Sign in with Base from the Wallet tab first.');
+      Alert.alert('Wallet required', 'Sign in with Privy from the Wallet tab first.');
       return;
     }
     const tokens = FEED_BUY_ETH / launch.priceEth;
