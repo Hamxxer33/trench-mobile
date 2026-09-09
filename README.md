@@ -99,10 +99,12 @@ eas.json       # preview / production build profiles
 
 ## Play listing assets
 
-Figma pack lives in the research repo (not committed here as binaries):
+Store binaries live in-repo under `assets/play/` (cropped from Figma comps):
 
-- Spec: `trench-research/design/play-listing-assets.md`
-- Comps: `trench-research/design/comps/` — `trench-play-icon.png` (512²), `trench-play-feature.png` (~1024×500), plus phone shots (Login → Feed → Coin → Create → Portfolio → Wallet → Settings/Legal; P1 Groups)
+- `assets/play/trench-play-icon.png` — app / splash / Android adaptive foreground
+- `assets/play/trench-play-feature.png` — Play feature graphic
+- Wired in `app.json` → `assets/images/{icon,splash-icon,android-icon-*}.png`
+- Spec (research): `trench-research/design/play-listing-assets.md`
 - Package: `fun.trench.app` · closed test only · “built on Base” · no earnings glamor
 
 ## Notes
