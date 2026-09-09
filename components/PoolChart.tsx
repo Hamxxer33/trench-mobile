@@ -8,8 +8,8 @@ type Props = {
   height?: number;
 };
 
-/** Simple mock bonding-curve visualization (no SVG dependency). */
-export function BondingCurveChart({ points, height = 160 }: Props) {
+/** Simple mock one-sided LP / pool chart (no SVG dependency). */
+export function PoolChart({ points, height = 160 }: Props) {
   if (points.length === 0) {
     return (
       <View style={[styles.wrap, { height }]}>
@@ -25,7 +25,7 @@ export function BondingCurveChart({ points, height = 160 }: Props) {
 
   return (
     <View style={styles.wrap}>
-      <Text style={styles.label}>Bonding curve (mock)</Text>
+      <Text style={styles.label}>One-sided LP / pool (mock)</Text>
       <View style={[styles.chart, { height }]}>
         {points.map((p) => {
           const pct = ((p.price - min) / range) * 100;

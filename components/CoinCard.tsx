@@ -52,7 +52,7 @@ export function CoinCard({ launch }: Props) {
             <View style={styles.progressTrack}>
               <View style={[styles.progressFill, { width: `${launch.progressPct}%` }]} />
             </View>
-            <Text style={styles.progressLabel}>{launch.progressPct}% to graduate</Text>
+            <Text style={styles.progressLabel}>{launch.progressPct}% filled</Text>
           </View>
         </Pressable>
       </Link>
