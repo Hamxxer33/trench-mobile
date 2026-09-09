@@ -2,8 +2,10 @@ import { Stack, useLocalSearchParams } from 'expo-router';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { AntiSnipeBanner } from '@/components/AntiSnipeBanner';
+import { MembersFirstBanner } from '@/components/MembersFirstBanner';
 import { BuySellPanel } from '@/components/BuySellPanel';
 import { PoolChart } from '@/components/PoolChart';
+import { getGroupForLaunch } from '@/data/mocks/groups';
 import { getLaunchById } from '@/data/mocks/launches';
 import { shortenAddress } from '@/data/mocks/wallet';
 import { colors, radius, spacing, typography } from '@/theme';
@@ -22,6 +24,7 @@ export default function CoinDetailScreen() {
   }
 
   const up = launch.change24hPct >= 0;
+  const membersGroup = getGroupForLaunch(launch.id);
 
   return (
     <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
@@ -45,6 +48,10 @@ export default function CoinDetailScreen() {
       </View>
 
       <Text style={styles.desc}>{launch.description}</Text>
+
+      {membersGroup && (
+        <MembersFirstBanner variant="coin" groupName={membersGroup.name} />
+      )}
 
       <View style={styles.stats}>
         <Stat label="Market cap" value={`${launch.marketCapEth.toFixed(1)} ETH`} />

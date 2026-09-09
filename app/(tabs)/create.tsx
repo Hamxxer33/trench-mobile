@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { TrenchBaseLockup } from '@/components/TrenchBaseLockup';
 import { useWallet } from '@/components/WalletContext';
+import { getMyGroups } from '@/data/mocks/groups';
 import { colors, radius, spacing, tabBar, typography } from '@/theme';
 
 type Step = 1 | 2 | 3 | 4 | 5;
@@ -49,6 +50,10 @@ export default function CreateLaunchScreen() {
   const [firstBuyAmount, setFirstBuyAmount] = useState('0.01');
   /** Optional referrer code — mock only. */
   const [referrer, setReferrer] = useState('');
+  /** Link group + notify on launch (V1.2). */
+  const myGroups = getMyGroups();
+  const [linkedGroupId, setLinkedGroupId] = useState<string | null>(null);
+  const [notifyGroup, setNotifyGroup] = useState(true);
 
   const selectedArt =
     artId === 'upload'
@@ -81,6 +86,8 @@ export default function CreateLaunchScreen() {
     setFirstBuyEnabled(false);
     setFirstBuyAmount('0.01');
     setReferrer('');
+    setLinkedGroupId(null);
+    setNotifyGroup(true);
   };
 
   const onLaunch = () => {
@@ -114,10 +121,14 @@ export default function CreateLaunchScreen() {
     const refLine = referrer.trim()
       ? `Referrer: ${referrer.trim()}`
       : 'Referrer: none';
+    const linked = myGroups.find((g) => g.id === linkedGroupId);
+    const groupLine = linked
+      ? `Group: ${linked.name} · notify ${notifyGroup ? 'on' : 'off'}`
+      : 'Group: none';
 
     Alert.alert(
       'Launch queued (mock)',
-      `${name} ($${symbol.toUpperCase()})\nArt: ${selectedArt?.label ?? '—'}\n${buyLine}\n${refLine}${
+      `${name} ($${symbol.toUpperCase()})\nArt: ${selectedArt?.label ?? '—'}\n${buyLine}\n${refLine}\n${groupLine}${
         socialBits.length ? `\n${socialBits.join(' · ')}` : ''
       }\n\nMock trade — no chain.`,
     );
@@ -323,6 +334,64 @@ export default function CreateLaunchScreen() {
                 </>
               )}
 
+              <View style={styles.toggleRow}>
+                <View style={styles.toggleCopy}>
+                  <Text style={styles.labelTight}>Also create / link a group</Text>
+                  <Text style={styles.toggleHint}>
+                    Members see launch first · pick existing mock group
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.groupChips}>
+                <Pressable
+                  onPress={() => {
+                    setLinkedGroupId(null);
+                    setNotifyGroup(false);
+                  }}
+                  style={[styles.groupChip, linkedGroupId === null && styles.groupChipActive]}>
+                  <Text
+                    style={[
+                      styles.groupChipText,
+                      linkedGroupId === null && styles.groupChipTextActive,
+                    ]}>
+                    None
+                  </Text>
+                </Pressable>
+                {myGroups.map((g) => {
+                  const active = linkedGroupId === g.id;
+                  return (
+                    <Pressable
+                      key={g.id}
+                      onPress={() => {
+                        setLinkedGroupId(g.id);
+                        setNotifyGroup(true);
+                      }}
+                      style={[styles.groupChip, active && styles.groupChipActive]}>
+                      <Text
+                        style={[styles.groupChipText, active && styles.groupChipTextActive]}>
+                        {g.avatarEmoji} {g.name}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+
+              {linkedGroupId && (
+                <View style={styles.toggleRow}>
+                  <View style={styles.toggleCopy}>
+                    <Text style={styles.labelTight}>Notify group on launch</Text>
+                    <Text style={styles.toggleHint}>Default on when a group is linked</Text>
+                  </View>
+                  <Switch
+                    value={notifyGroup}
+                    onValueChange={setNotifyGroup}
+                    trackColor={{ false: colors.border, true: colors.baseBlue }}
+                    thumbColor={colors.white}
+                    ios_backgroundColor={colors.border}
+                  />
+                </View>
+              )}
+
               <View style={styles.summary}>
                 <Text style={styles.summaryTitle}>Review</Text>
                 <View style={styles.summaryArtRow}>
@@ -358,6 +427,14 @@ export default function CreateLaunchScreen() {
                 </Text>
                 <Text style={styles.summaryLine}>
                   Referrer: {referrer.trim() || 'none'}
+                </Text>
+                <Text style={styles.summaryLine}>
+                  Group:{' '}
+                  {linkedGroupId
+                    ? `${myGroups.find((g) => g.id === linkedGroupId)?.name ?? '—'} · notify ${
+                        notifyGroup ? 'on' : 'off'
+                      }`
+                    : 'none'}
                 </Text>
                 <Text style={styles.warn}>
                   Fields are immutable after confirm (mock warning).
@@ -592,4 +669,16 @@ const styles = StyleSheet.create({
   },
   secondaryText: { color: colors.text, fontWeight: '600' },
   disabled: { opacity: 0.4 },
+  groupChips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginVertical: spacing.sm },
+  groupChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: radius.full,
+    backgroundColor: colors.surfaceElevated,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  groupChipActive: { borderColor: colors.baseBlue, backgroundColor: colors.baseBlueDark },
+  groupChipText: { color: colors.textSecondary, fontWeight: '600', fontSize: 13 },
+  groupChipTextActive: { color: colors.white },
 });
