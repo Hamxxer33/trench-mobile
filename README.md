@@ -22,7 +22,7 @@ Android-first. iOS project files are fine in-repo, but distribution is **off-sto
 | Create wizard | `/(tabs)/create` | Multi-step create; **first-buy optional, default off** |
 | Portfolio | `/(tabs)/portfolio` | Light stub — mock holdings / empty state |
 | Wallet stub | `/(tabs)/wallet` | Fake connect / disconnect |
-| Coin detail | `/coin/[id]` | Bonding curve chart + mock buy/sell |
+| Coin detail | `/coin/[id]` | One-sided LP / pool chart + mock buy/sell |
 
 **Nav:** Feed · Live · Create · Portfolio · Wallet
 

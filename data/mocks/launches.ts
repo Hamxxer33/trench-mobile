@@ -1,4 +1,4 @@
-export type LaunchStatus = 'new' | 'trending' | 'graduating';
+export type LaunchStatus = 'new' | 'trending' | 'filling';
 
 export type ChartPoint = {
   t: number;
@@ -22,7 +22,7 @@ export type MockLaunch = {
   chart: ChartPoint[];
 };
 
-function buildCurve(seed: number, points = 24): ChartPoint[] {
+function buildChart(seed: number, points = 24): ChartPoint[] {
   const out: ChartPoint[] = [];
   let price = 0.00001 + (seed % 7) * 0.000002;
   for (let i = 0; i < points; i++) {
@@ -48,7 +48,7 @@ export const MOCK_LAUNCHES: MockLaunch[] = [
     progressPct: 68,
     priceEth: 0.000042,
     change24hPct: 24.5,
-    chart: buildCurve(3),
+    chart: buildChart(3),
   },
   {
     id: 'blue-digger',
@@ -64,23 +64,23 @@ export const MOCK_LAUNCHES: MockLaunch[] = [
     progressPct: 22,
     priceEth: 0.000018,
     change24hPct: 8.1,
-    chart: buildCurve(5),
+    chart: buildChart(5),
   },
   {
     id: 'b20-rocket',
     name: 'B20 Rocket',
     symbol: 'B20R',
-    description: 'Bonding-curve memetics on Base. No real contracts yet.',
+    description: 'One-sided Uniswap v4 LP memetics on Base. No real contracts yet.',
     creator: '0xB20C0000000000000000000000000000000000FF',
     createdAt: '2026-09-08T21:00:00Z',
-    status: 'graduating',
+    status: 'filling',
     marketCapEth: 91.0,
     volume24hEth: 34.6,
     holders: 1204,
     progressPct: 94,
     priceEth: 0.000091,
     change24hPct: -3.2,
-    chart: buildCurve(11),
+    chart: buildChart(11),
   },
   {
     id: 'gasless-goblin',
@@ -96,7 +96,7 @@ export const MOCK_LAUNCHES: MockLaunch[] = [
     progressPct: 9,
     priceEth: 0.000009,
     change24hPct: 41.0,
-    chart: buildCurve(2),
+    chart: buildChart(2),
   },
   {
     id: 'trenchcoat',
@@ -112,13 +112,13 @@ export const MOCK_LAUNCHES: MockLaunch[] = [
     progressPct: 51,
     priceEth: 0.000031,
     change24hPct: 12.7,
-    chart: buildCurve(8),
+    chart: buildChart(8),
   },
   {
     id: 'basecamp',
     name: 'Basecamp',
     symbol: 'CAMP',
-    description: 'Camp at the curve. Demo token for Trench mobile.',
+    description: 'Camp at the pool. Demo token for Trench mobile.',
     creator: '0xCAFE0000000000000000000000000000000001',
     createdAt: '2026-09-06T09:00:00Z',
     status: 'trending',
@@ -128,7 +128,7 @@ export const MOCK_LAUNCHES: MockLaunch[] = [
     progressPct: 77,
     priceEth: 0.000055,
     change24hPct: -1.4,
-    chart: buildCurve(13),
+    chart: buildChart(13),
   },
 ];
 
@@ -137,7 +137,7 @@ export function getLaunchById(id: string): MockLaunch | undefined {
 }
 
 export function getTrending(): MockLaunch[] {
-  return MOCK_LAUNCHES.filter((l) => l.status === 'trending' || l.status === 'graduating');
+  return MOCK_LAUNCHES.filter((l) => l.status === 'trending' || l.status === 'filling');
 }
 
 export function getNew(): MockLaunch[] {

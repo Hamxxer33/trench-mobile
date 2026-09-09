@@ -1,7 +1,7 @@
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { BondingCurveChart } from '@/components/BondingCurveChart';
+import { PoolChart } from '@/components/PoolChart';
 import { BuySellPanel } from '@/components/BuySellPanel';
 import { getLaunchById } from '@/data/mocks/launches';
 import { shortenAddress } from '@/data/mocks/wallet';
@@ -49,12 +49,12 @@ export default function CoinDetailScreen() {
         <Stat label="Market cap" value={`${launch.marketCapEth.toFixed(1)} ETH`} />
         <Stat label="24h vol" value={`${launch.volume24hEth.toFixed(1)} ETH`} />
         <Stat label="Holders" value={String(launch.holders)} />
-        <Stat label="Progress" value={`${launch.progressPct}%`} />
+        <Stat label="Pool filled" value={`${launch.progressPct}%`} />
       </View>
 
       <Text style={styles.creator}>Creator {shortenAddress(launch.creator)}</Text>
 
-      <BondingCurveChart points={launch.chart} />
+      <PoolChart points={launch.chart} />
 
       <View style={{ height: spacing.md }} />
       <BuySellPanel symbol={launch.symbol} priceEth={launch.priceEth} />
