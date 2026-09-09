@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -17,29 +17,32 @@ import {
 import { useWallet } from '@/components/WalletContext';
 import { colors, radius, spacing, typography } from '@/theme';
 
-const SECONDARY = [
+/** Equal-weight Privy mock providers — no SDK / keys. */
+const PRIVY_PROVIDERS = [
   { id: 'google', label: 'Continue with Google' },
   { id: 'apple', label: 'Continue with Apple' },
   { id: 'email', label: 'Continue with email' },
 ] as const;
 
-/** White square + Base Blue mark — SiwB on dark canvas. */
-function BaseMark() {
-  return (
-    <View style={styles.markSquare} accessibilityElementsHidden>
-      <View style={styles.markInner} />
-    </View>
-  );
-}
+type ProviderId = (typeof PRIVY_PROVIDERS)[number]['id'];
 
 export default function LoginScreen() {
   const { connect, connecting } = useWallet();
   const router = useRouter();
+  const [activeProvider, setActiveProvider] = useState<ProviderId | null>(null);
 
-  const onSignInWithBase = useCallback(async () => {
-    await connect();
-    router.replace('/(tabs)');
-  }, [connect, router]);
+  const onPrivyMock = useCallback(
+    async (providerId: ProviderId) => {
+      setActiveProvider(providerId);
+      try {
+        await connect();
+        router.replace('/(tabs)');
+      } finally {
+        setActiveProvider(null);
+      }
+    },
+    [connect, router],
+  );
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
@@ -48,7 +51,7 @@ export default function LoginScreen() {
 
         <Text style={styles.hero}>Launch & trade on Base</Text>
         <Text style={styles.heroSub}>
-          One-sided LP / pool chrome — mock V1, no chain yet.
+          Sign in with Privy (mock) — Google, Apple, or email. No chain yet.
         </Text>
 
         <GlassSurface
@@ -56,39 +59,48 @@ export default function LoginScreen() {
           borderRadius={radius.xl}
           style={styles.panel}
           contentStyle={styles.panelInner}>
-          <Pressable
-            disabled={connecting}
-            onPress={onSignInWithBase}
-            accessibilityRole="button"
-            accessibilityLabel="Sign in with Base"
-            style={({ pressed }) => [
-              styles.primary,
-              pressed && { opacity: 0.88 },
-              connecting && { opacity: 0.65 },
-            ]}>
-            {connecting ? (
-              <ActivityIndicator color={colors.white} />
-            ) : (
-              <View style={styles.primaryRow}>
-                <BaseMark />
-                <Text style={styles.primaryText}>Sign in with Base</Text>
-              </View>
-            )}
-          </Pressable>
-          <Text style={styles.subcopy}>Passkey · free · no seed phrase drama</Text>
+          <Text style={styles.sectionLabel}>Sign in</Text>
+          <View style={styles.primaryBlock}>
+            {PRIVY_PROVIDERS.map((item) => {
+              const busy = connecting && activeProvider === item.id;
+              return (
+                <Pressable
+                  key={item.id}
+                  disabled={connecting}
+                  onPress={() => onPrivyMock(item.id)}
+                  accessibilityRole="button"
+                  accessibilityLabel={item.label}
+                  style={({ pressed }) => [
+                    styles.primary,
+                    pressed && { opacity: 0.88 },
+                    connecting && { opacity: busy ? 0.85 : 0.55 },
+                  ]}>
+                  {busy ? (
+                    <ActivityIndicator color={colors.background} />
+                  ) : (
+                    <Text style={styles.primaryText}>{item.label}</Text>
+                  )}
+                </Pressable>
+              );
+            })}
+          </View>
+          <Text style={styles.subcopy}>Privy mock · equal CTAs · no SDK</Text>
 
-          <View style={styles.secondaryBlock}>
-            {SECONDARY.map((item) => (
-              <Pressable
-                key={item.id}
-                disabled
-                accessibilityState={{ disabled: true }}
-                accessibilityLabel={`${item.label}, soon`}
-                style={styles.secondary}>
-                <Text style={styles.secondaryText}>{item.label}</Text>
-                <Text style={styles.soon}>soon</Text>
-              </Pressable>
-            ))}
+          <View style={styles.parkedBlock}>
+            <Pressable
+              disabled
+              accessibilityState={{ disabled: true }}
+              accessibilityLabel="Sign in with Base, soon"
+              style={styles.parked}>
+              <View style={styles.parkedRow}>
+                <View style={styles.markSquare} accessibilityElementsHidden>
+                  <View style={styles.markInner} />
+                </View>
+                <Text style={styles.parkedText}>Sign in with Base</Text>
+              </View>
+              <Text style={styles.soon}>soon</Text>
+            </Pressable>
+            <Text style={styles.parkedHint}>CDP / SiwB parked — not primary</Text>
           </View>
         </GlassSurface>
 
@@ -125,38 +137,29 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     gap: spacing.md,
   },
+  sectionLabel: {
+    color: colors.textSecondary,
+    fontSize: 13,
+    fontWeight: '600',
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
+  },
+  primaryBlock: {
+    gap: spacing.sm,
+  },
   primary: {
-    backgroundColor: colors.baseBlue,
+    backgroundColor: colors.white,
     paddingVertical: 16,
     paddingHorizontal: spacing.md,
     borderRadius: radius.md,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 56,
-  },
-  primaryRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  markSquare: {
-    width: 22,
-    height: 22,
-    borderRadius: 4,
-    backgroundColor: colors.white,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  markInner: {
-    width: 12,
-    height: 12,
-    borderRadius: 2,
-    backgroundColor: colors.baseBlue,
+    minHeight: 52,
   },
   primaryText: {
-    color: colors.white,
+    color: colors.background,
     fontWeight: '700',
-    fontSize: 17,
+    fontSize: 16,
   },
   subcopy: {
     color: colors.textSecondary,
@@ -164,11 +167,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: -spacing.xs,
   },
-  secondaryBlock: {
+  parkedBlock: {
     gap: spacing.sm,
-    marginTop: spacing.sm,
+    marginTop: spacing.xs,
   },
-  secondary: {
+  parked: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -177,9 +180,28 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     borderWidth: StyleSheet.hairlineWidth * 2,
     borderColor: colors.glassBorder,
-    opacity: 0.45,
+    opacity: 0.42,
   },
-  secondaryText: {
+  parkedRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  markSquare: {
+    width: 18,
+    height: 18,
+    borderRadius: 4,
+    backgroundColor: colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  markInner: {
+    width: 10,
+    height: 10,
+    borderRadius: 2,
+    backgroundColor: colors.baseBlue,
+  },
+  parkedText: {
     color: colors.textMuted,
     fontWeight: '600',
     fontSize: 15,
@@ -190,6 +212,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.6,
+  },
+  parkedHint: {
+    color: colors.textMuted,
+    fontSize: 12,
+    textAlign: 'center',
   },
   footerBlock: {
     marginTop: 'auto' as const,
