@@ -6,6 +6,7 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TextInput,
   View,
@@ -17,33 +18,61 @@ import { colors, radius, spacing, typography } from '@/theme';
 
 type Step = 1 | 2 | 3;
 
+/** Figma lock: first-buy is optional and defaults OFF. Cap stub amount. */
+const FIRST_BUY_CAP_ETH = 0.1;
+
 export default function CreateLaunchScreen() {
   const { wallet } = useWallet();
   const [step, setStep] = useState<Step>(1);
   const [name, setName] = useState('');
   const [symbol, setSymbol] = useState('');
   const [description, setDescription] = useState('');
-  const [initialBuy, setInitialBuy] = useState('0.05');
+  /** Optional first-buy — default OFF (Figma lock). */
+  const [firstBuyEnabled, setFirstBuyEnabled] = useState(false);
+  const [firstBuyAmount, setFirstBuyAmount] = useState('0.01');
 
   const canNext =
     (step === 1 && name.trim().length >= 2 && symbol.trim().length >= 2) ||
     (step === 2 && description.trim().length >= 8) ||
     step === 3;
 
+  const clampFirstBuy = (raw: string) => {
+    setFirstBuyAmount(raw);
+  };
+
   const onLaunch = () => {
     if (!wallet) {
       Alert.alert('Connect wallet', 'Use the Wallet tab to connect a mock wallet first.');
       return;
     }
+
+    let buyLine = 'First buy: off';
+    if (firstBuyEnabled) {
+      const value = Number(firstBuyAmount);
+      if (!Number.isFinite(value) || value <= 0) {
+        Alert.alert('Invalid first buy', 'Enter a positive ETH amount or turn first buy off.');
+        return;
+      }
+      if (value > FIRST_BUY_CAP_ETH) {
+        Alert.alert(
+          'First buy capped',
+          `Mock first buy is capped at ${FIRST_BUY_CAP_ETH} ETH.`,
+        );
+        return;
+      }
+      buyLine = `First buy: ${value} ETH (mock)`;
+    }
+
     Alert.alert(
       'Launch queued (mock)',
-      `${name} ($${symbol.toUpperCase()})\nInitial buy: ${initialBuy} ETH\n\nNo contracts — V1 mock wizard only.`,
+      `${name} ($${symbol.toUpperCase()})\n${buyLine}\n\nMock trade — no chain.`,
     );
     setStep(1);
     setName('');
     setSymbol('');
     setDescription('');
-    setInitialBuy('0.05');
+    setFirstBuyEnabled(false);
+    setFirstBuyAmount('0.01');
   };
 
   return (
@@ -52,7 +81,7 @@ export default function CreateLaunchScreen() {
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <Text style={styles.title}>Launch a coin</Text>
+          <Text style={styles.title}>Create coin</Text>
           <Text style={styles.subtitle}>Multi-step wizard · mock only</Text>
 
           <View style={styles.steps}>
@@ -102,15 +131,36 @@ export default function CreateLaunchScreen() {
 
           {step === 3 && (
             <View style={styles.card}>
-              <Text style={styles.label}>Initial buy (ETH)</Text>
-              <TextInput
-                style={styles.input}
-                value={initialBuy}
-                onChangeText={setInitialBuy}
-                keyboardType="decimal-pad"
-                placeholder="0.05"
-                placeholderTextColor={colors.textMuted}
-              />
+              <View style={styles.toggleRow}>
+                <View style={styles.toggleCopy}>
+                  <Text style={styles.labelTight}>Optional first buy</Text>
+                  <Text style={styles.toggleHint}>
+                    Default off · capped at {FIRST_BUY_CAP_ETH} ETH (mock)
+                  </Text>
+                </View>
+                <Switch
+                  value={firstBuyEnabled}
+                  onValueChange={setFirstBuyEnabled}
+                  trackColor={{ false: colors.border, true: colors.baseBlue }}
+                  thumbColor={colors.white}
+                  ios_backgroundColor={colors.border}
+                />
+              </View>
+
+              {firstBuyEnabled && (
+                <>
+                  <Text style={styles.label}>First buy (ETH)</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={firstBuyAmount}
+                    onChangeText={clampFirstBuy}
+                    keyboardType="decimal-pad"
+                    placeholder="0.01"
+                    placeholderTextColor={colors.textMuted}
+                  />
+                </>
+              )}
+
               <View style={styles.summary}>
                 <Text style={styles.summaryTitle}>Review</Text>
                 <Text style={styles.summaryLine}>
@@ -119,7 +169,12 @@ export default function CreateLaunchScreen() {
                 <Text style={styles.summaryLine} numberOfLines={3}>
                   {description || '—'}
                 </Text>
-                <Text style={styles.summaryLine}>Buy-in: {initialBuy} ETH</Text>
+                <Text style={styles.summaryLine}>
+                  First buy: {firstBuyEnabled ? `${firstBuyAmount} ETH` : 'off'}
+                </Text>
+                <Text style={styles.warn}>
+                  Fields are immutable after confirm (mock warning).
+                </Text>
               </View>
             </View>
           )}
@@ -147,7 +202,7 @@ export default function CreateLaunchScreen() {
               <Pressable
                 onPress={onLaunch}
                 style={({ pressed }) => [styles.primary, pressed && { opacity: 0.85 }]}>
-                <Text style={styles.primaryText}>Launch (mock)</Text>
+                <Text style={styles.primaryText}>Create coin (mock)</Text>
               </Pressable>
             )}
           </View>
@@ -184,6 +239,16 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   label: { color: colors.textSecondary, fontSize: 13, marginTop: 4 },
+  labelTight: { color: colors.text, fontSize: 15, fontWeight: '600' },
+  toggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+    paddingVertical: 4,
+  },
+  toggleCopy: { flex: 1, gap: 2 },
+  toggleHint: { color: colors.textMuted, fontSize: 12 },
   input: {
     backgroundColor: colors.surfaceElevated,
     borderRadius: radius.md,
@@ -204,6 +269,7 @@ const styles = StyleSheet.create({
   },
   summaryTitle: { color: colors.baseBlueLight, fontWeight: '700' },
   summaryLine: { color: colors.textSecondary },
+  warn: { color: colors.warning, fontSize: 12, marginTop: 6 },
   actions: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.lg },
   primary: {
     flex: 1,

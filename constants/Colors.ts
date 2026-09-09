@@ -1,14 +1,10 @@
-const tintColorLight = '#0052FF';
+/**
+ * Legacy Colors helper — dark-only (Figma lock).
+ * Prefer `@/theme` colors in new code. No light theme.
+ */
 const tintColorDark = '#3B7AFF';
 
 export default {
-  light: {
-    text: '#000',
-    background: '#fff',
-    tint: tintColorLight,
-    tabIconDefault: '#ccc',
-    tabIconSelected: tintColorLight,
-  },
   dark: {
     text: '#F5F7FA',
     background: '#0A0B0D',

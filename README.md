@@ -10,7 +10,7 @@ Android-first. iOS project files are fine in-repo, but distribution is **off-sto
 
 - Expo (React Native) + TypeScript
 - Expo Router (file-based navigation)
-- Base-inspired dark / blue theme (`theme/`)
+- Base-inspired **dark-only** theme (`theme/`) — no light mode
 - Mock data in `data/mocks/`
 
 ## Screens
@@ -18,9 +18,13 @@ Android-first. iOS project files are fine in-repo, but distribution is **off-sto
 | Screen | Route | Description |
 |--------|-------|-------------|
 | Home feed | `/(tabs)` | New / trending mock launches |
-| Coin detail | `/coin/[id]` | Bonding curve chart + mock buy/sell |
-| Launch wizard | `/(tabs)/create` | Multi-step create flow |
+| Live | `/(tabs)/live` | Stub placeholder (no livestream) |
+| Create wizard | `/(tabs)/create` | Multi-step create; **first-buy optional, default off** |
+| Portfolio | `/(tabs)/portfolio` | Light stub — mock holdings / empty state |
 | Wallet stub | `/(tabs)/wallet` | Fake connect / disconnect |
+| Coin detail | `/coin/[id]` | Bonding curve chart + mock buy/sell |
+
+**Nav:** Feed · Live · Create · Portfolio · Wallet
 
 ## Run
 
@@ -45,11 +49,12 @@ CI: `.github/workflows/ci.yml` runs lint + typecheck on push/PR.
 ```
 app/           # Expo Router screens
 components/    # UI + WalletContext
-data/mocks/    # Mock launches & wallets
-theme/         # Colors, spacing, typography
+data/mocks/    # Mock launches, wallets, portfolio
+theme/         # Colors, spacing, typography (dark-only)
 ```
 
 ## Notes
 
 - Do not commit secrets.
 - Real chain wiring lives outside this repo (contracts / web).
+- Figma locks: dark-only app; first-buy on Create is optional and defaults **off**.

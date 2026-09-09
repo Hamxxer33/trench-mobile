@@ -16,6 +16,7 @@ export const unstable_settings = {
 
 SplashScreen.preventAutoHideAsync();
 
+/** Dark-only theme (Figma lock) — never switch to LightTheme. */
 const trenchTheme = {
   ...DarkTheme,
   colors: {
