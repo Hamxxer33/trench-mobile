@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { CoinCard } from '@/components/CoinCard';
 import { TrenchBaseLockup } from '@/components/TrenchBaseLockup';
 import { getNew, getTrending } from '@/data/mocks/launches';
-import { colors, spacing } from '@/theme';
+import { colors, spacing, tabBar } from '@/theme';
 
 type FeedTab = 'trending' | 'new';
 
@@ -17,7 +17,7 @@ export default function HomeFeedScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <TrenchBaseLockup />
-        <Text style={styles.subtitle}>Base-native B20 launchpad · mock V1</Text>
+        <Text style={styles.subtitle}>Trench × Base · one-sided LP / pool · mock V1.1</Text>
       </View>
 
       <View style={styles.tabs}>
@@ -38,8 +38,10 @@ export default function HomeFeedScreen() {
       <FlatList
         data={data}
         keyExtractor={(item) => item.id}
+        numColumns={2}
+        columnWrapperStyle={styles.row}
         contentContainerStyle={styles.list}
-        renderItem={({ item }) => <CoinCard launch={item} />}
+        renderItem={({ item }) => <CoinCard launch={item} compact />}
         ListEmptyComponent={<Text style={styles.empty}>No launches yet.</Text>}
       />
     </SafeAreaView>
@@ -61,12 +63,19 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 999,
     backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: colors.glassBorder,
   },
-  chipActive: { backgroundColor: colors.baseBlue, borderColor: colors.baseBlue },
+  chipActive: {
+    backgroundColor: 'transparent',
+    borderColor: colors.white,
+  },
   chipText: { color: colors.textSecondary, fontWeight: '600' },
   chipTextActive: { color: colors.white },
-  list: { paddingHorizontal: spacing.lg, paddingBottom: spacing.xxl },
+  row: { gap: spacing.sm },
+  list: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: tabBar.contentInset,
+  },
   empty: { color: colors.textMuted, textAlign: 'center', marginTop: spacing.xl },
 });

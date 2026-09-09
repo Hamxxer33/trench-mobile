@@ -2,9 +2,10 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BuiltOnBaseFooter, TrenchBaseLockup } from '@/components/TrenchBaseLockup';
+import { GlassSurface } from '@/components/GlassSurface';
 import { useWallet } from '@/components/WalletContext';
 import { shortenAddress } from '@/data/mocks/wallet';
-import { colors, radius, spacing, typography } from '@/theme';
+import { colors, radius, spacing, tabBar, typography } from '@/theme';
 
 export default function WalletScreen() {
   const { wallet, connecting, connect, disconnect } = useWallet();
@@ -19,7 +20,7 @@ export default function WalletScreen() {
         </Text>
 
         {wallet ? (
-          <View style={styles.card}>
+          <GlassSurface intensity={48} borderRadius={radius.xl} contentStyle={styles.card}>
             <Text style={styles.badge}>Signed in with Base (mock)</Text>
             <Text style={styles.label}>{wallet.label}</Text>
             <Text style={styles.address}>{shortenAddress(wallet.address)}</Text>
@@ -29,9 +30,9 @@ export default function WalletScreen() {
               style={({ pressed }) => [styles.secondary, pressed && { opacity: 0.85 }]}>
               <Text style={styles.secondaryText}>Disconnect</Text>
             </Pressable>
-          </View>
+          </GlassSurface>
         ) : (
-          <View style={styles.card}>
+          <GlassSurface intensity={48} borderRadius={radius.xl} contentStyle={styles.card}>
             <Text style={styles.empty}>Not connected</Text>
             <Text style={styles.hint}>
               Sign in with Base to unlock mock buy/sell & launch. Fake connect only.
@@ -52,7 +53,7 @@ export default function WalletScreen() {
                 <Text style={styles.primaryText}>Sign in with Base</Text>
               )}
             </Pressable>
-          </View>
+          </GlassSurface>
         )}
 
         <BuiltOnBaseFooter style={styles.footer} />
@@ -63,15 +64,11 @@ export default function WalletScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
-  content: { flex: 1, padding: spacing.lg },
+  content: { flex: 1, padding: spacing.lg, paddingBottom: tabBar.contentInset },
   lockup: { marginBottom: spacing.sm },
   title: { ...typography.title, color: colors.text },
   subtitle: { color: colors.textMuted, marginBottom: spacing.lg },
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
     padding: spacing.lg,
     gap: spacing.sm,
   },
@@ -104,8 +101,8 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     paddingVertical: 12,
     borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: colors.glassBorder,
     alignItems: 'center',
   },
   secondaryText: { color: colors.text, fontWeight: '600' },

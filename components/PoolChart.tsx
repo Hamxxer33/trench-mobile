@@ -46,7 +46,8 @@ export function PoolChart({ points, height = 160 }: Props) {
 
 const styles = StyleSheet.create({
   wrap: {
-    backgroundColor: colors.surface,
+    /** Pool card stays opaque #32353D (not glass). */
+    backgroundColor: colors.baseGray,
     borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: colors.border,

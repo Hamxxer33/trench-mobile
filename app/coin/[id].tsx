@@ -107,10 +107,10 @@ const styles = StyleSheet.create({
   },
   stat: {
     width: '47%',
-    backgroundColor: colors.surface,
+    backgroundColor: colors.baseGray,
     borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: colors.glassBorder,
     padding: spacing.md,
   },
   statLabel: { color: colors.textMuted, fontSize: 12 },
