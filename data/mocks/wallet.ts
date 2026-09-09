@@ -1,14 +1,14 @@
-/** Fake wallet identities for the connect stub — no real chain. */
+/** Fake wallet identities for the Privy connect stub — no real chain. */
 export const MOCK_WALLETS = [
   {
     id: 'mock-1',
-    label: 'Base Account',
+    label: 'Privy account',
     address: '0xTr3nch0000000000000000000000000000DeM0',
     balanceEth: 1.25,
   },
   {
     id: 'mock-2',
-    label: 'Base Account (alt)',
+    label: 'Privy account (alt)',
     address: '0xP4p3r00000000000000000000000000000001',
     balanceEth: 0.42,
   },

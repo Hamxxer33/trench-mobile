@@ -17,7 +17,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
   const connect = useCallback(async (walletId?: string) => {
     setConnecting(true);
-    // Simulate async wallet connect — mock only
+    // Simulate async Privy / wallet connect — mock only
     await new Promise((r) => setTimeout(r, 600));
     const next =
       MOCK_WALLETS.find((w) => w.id === walletId) ?? MOCK_WALLETS[0];
