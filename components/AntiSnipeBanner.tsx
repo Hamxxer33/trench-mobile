@@ -15,14 +15,12 @@ type Props = {
 const YOUNG_PROGRESS_MAX = 30;
 
 /**
- * Mock anti-snipe chrome: elevated launch fee that decays to the steady 1%.
+ * Mock anti-snipe chrome: 99% → 1% over 20s (contracts truth), then steady 1%.
  * Copy only — no fee math / contracts.
  */
 export function AntiSnipeBanner({ progressPct, status, style }: Props) {
   const young = status === 'new' || progressPct < YOUNG_PROGRESS_MAX;
   if (!young) return null;
-
-  const elevatedFee = progressPct < 10 ? 5 : progressPct < 20 ? 3 : 2;
 
   return (
     <GlassSurface
@@ -33,12 +31,12 @@ export function AntiSnipeBanner({ progressPct, status, style }: Props) {
       accessibilityLabel="Anti-snipe fee banner">
       <View style={styles.row}>
         <Text style={styles.badge}>Anti-snipe</Text>
-        <Text style={styles.fee}>{elevatedFee}% → 1%</Text>
+        <Text style={styles.fee}>99% → 1% · 20s</Text>
       </View>
       <Text style={styles.copy}>
-        New launch · elevated fee while the pool fills ({progressPct}% filled). Decays to the
-        steady <Text style={styles.em}>1%</Text> trade fee once the early window closes. Mock
-        copy only.
+        New launch · fee starts at <Text style={styles.em}>99%</Text> and decays to the steady{' '}
+        <Text style={styles.em}>1%</Text> over <Text style={styles.em}>20 seconds</Text> (
+        {progressPct}% filled). Mock copy only — matches TrenchHook anti-snipe.
       </Text>
     </GlassSurface>
   );
