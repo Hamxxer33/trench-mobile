@@ -3,12 +3,16 @@ export const MOCK_WALLETS = [
   {
     id: 'mock-1',
     label: 'Privy account',
+    email: 'trencher@example.com',
+    handle: '@trencher',
     address: '0xTr3nch0000000000000000000000000000DeM0',
     balanceEth: 1.25,
   },
   {
     id: 'mock-2',
     label: 'Privy account (alt)',
+    email: 'ape@example.com',
+    handle: '@ape.den',
     address: '0xP4p3r00000000000000000000000000000001',
     balanceEth: 0.42,
   },
