@@ -7,12 +7,14 @@ import { colors, radius, spacing } from '@/theme';
 
 type Props = {
   launch: MockLaunch;
+  /** Compact 2-col feed card */
+  compact?: boolean;
 };
 
 /** Default mock buy size from feed (ETH). */
 const FEED_BUY_ETH = 0.01;
 
-export function CoinCard({ launch }: Props) {
+export function CoinCard({ launch, compact = false }: Props) {
   const { wallet } = useWallet();
   const up = launch.change24hPct >= 0;
 
@@ -27,6 +29,40 @@ export function CoinCard({ launch }: Props) {
       `Bought ~${tokens.toFixed(2)} ${launch.symbol} for ${FEED_BUY_ETH} ETH.\n\nNo on-chain tx — V1 mock only.`,
     );
   };
+
+  if (compact) {
+    return (
+      <View style={styles.compactCard}>
+        <Link href={`/coin/${launch.id}`} asChild>
+          <Pressable style={({ pressed }) => [styles.compactBody, pressed && styles.pressed]}>
+            <View style={styles.compactArt}>
+              <Text style={styles.avatarText}>{launch.symbol.slice(0, 2)}</Text>
+            </View>
+            <View style={styles.compactMeta}>
+              <Text style={styles.compactTicker} numberOfLines={1}>
+                {launch.symbol}
+              </Text>
+              <Text style={[styles.change, up ? styles.up : styles.down]}>
+                {up ? '+' : ''}
+                {launch.change24hPct.toFixed(1)}%
+              </Text>
+            </View>
+            <View style={styles.progressTrack}>
+              <View style={[styles.progressFill, { width: `${launch.progressPct}%` }]} />
+            </View>
+            <Text style={styles.progressLabel}>{launch.progressPct}% filled</Text>
+          </Pressable>
+        </Link>
+        <Pressable
+          onPress={onBuy}
+          accessibilityRole="button"
+          accessibilityLabel={`Buy ${launch.symbol}`}
+          style={({ pressed }) => [styles.compactBuy, pressed && { opacity: 0.85 }]}>
+          <Text style={styles.buyText}>Buy</Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.card}>
@@ -74,8 +110,8 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: colors.glassBorder,
     padding: spacing.md,
     marginBottom: spacing.sm,
   },
@@ -109,7 +145,7 @@ const styles = StyleSheet.create({
   down: { color: colors.danger },
   progressTrack: {
     height: 4,
-    backgroundColor: colors.surfaceElevated,
+    backgroundColor: 'rgba(255,255,255,0.08)',
     borderRadius: radius.full,
     marginTop: spacing.sm,
     overflow: 'hidden',
@@ -128,4 +164,43 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   buyText: { color: colors.white, fontWeight: '700', fontSize: 14 },
+  /** 2-col feed variant */
+  compactCard: {
+    flex: 1,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: colors.glassBorder,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+    gap: spacing.sm,
+  },
+  compactBody: { gap: spacing.sm },
+  compactArt: {
+    width: '100%',
+    aspectRatio: 1,
+    borderRadius: radius.md,
+    backgroundColor: colors.baseBlueDark,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  compactMeta: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  compactTicker: {
+    color: colors.text,
+    fontWeight: '700',
+    fontFamily: 'SpaceMono',
+    fontSize: 14,
+    flex: 1,
+  },
+  compactBuy: {
+    backgroundColor: colors.baseBlue,
+    paddingVertical: 10,
+    borderRadius: radius.md,
+    alignItems: 'center',
+  },
 });

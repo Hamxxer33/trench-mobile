@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { TrenchBaseLockup } from '@/components/TrenchBaseLockup';
 import { useWallet } from '@/components/WalletContext';
-import { colors, radius, spacing, typography } from '@/theme';
+import { colors, radius, spacing, tabBar, typography } from '@/theme';
 
 type Step = 1 | 2 | 3 | 4 | 5;
 
@@ -423,7 +423,7 @@ export default function CreateLaunchScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.lg, paddingBottom: spacing.xxl },
+  content: { padding: spacing.lg, paddingBottom: tabBar.contentInset },
   lockup: { marginBottom: spacing.sm },
   title: { ...typography.title, color: colors.text },
   subtitle: { color: colors.textMuted, marginBottom: spacing.lg },

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
+import { GlassSurface } from '@/components/GlassSurface';
 import { useWallet } from '@/components/WalletContext';
 import { colors, radius, spacing } from '@/theme';
 
@@ -11,6 +12,7 @@ type Props = {
   priceEth: number;
 };
 
+/** Glass Buy/Sell sheet — pool card stays opaque elsewhere. */
 export function BuySellPanel({ symbol, priceEth }: Props) {
   const { wallet } = useWallet();
   const [mode, setMode] = useState<Mode>('buy');
@@ -34,7 +36,8 @@ export function BuySellPanel({ symbol, priceEth }: Props) {
   };
 
   return (
-    <View style={styles.wrap}>
+    <GlassSurface intensity={50} borderRadius={radius.xl} contentStyle={styles.wrap}>
+      <Text style={styles.sheetTitle}>Trade</Text>
       <View style={styles.tabs}>
         <Pressable
           onPress={() => setMode('buy')}
@@ -72,37 +75,41 @@ export function BuySellPanel({ symbol, priceEth }: Props) {
           {mode === 'buy' ? `Buy ${symbol}` : `Sell ${symbol}`} (mock)
         </Text>
       </Pressable>
-    </View>
+    </GlassSurface>
   );
 }
 
 const styles = StyleSheet.create({
   wrap: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
     padding: spacing.md,
     gap: spacing.sm,
+  },
+  sheetTitle: {
+    color: colors.textSecondary,
+    fontSize: 13,
+    fontWeight: '600',
+    marginBottom: 2,
   },
   tabs: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.sm },
   tab: {
     flex: 1,
     paddingVertical: 10,
     borderRadius: radius.md,
-    backgroundColor: colors.surfaceElevated,
+    backgroundColor: 'rgba(255,255,255,0.06)',
     alignItems: 'center',
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: colors.glassBorder,
   },
-  tabBuyActive: { backgroundColor: colors.baseBlue },
-  tabSellActive: { backgroundColor: colors.danger },
+  tabBuyActive: { backgroundColor: colors.baseBlue, borderColor: colors.baseBlue },
+  tabSellActive: { backgroundColor: colors.danger, borderColor: colors.danger },
   tabText: { color: colors.textSecondary, fontWeight: '600' },
   tabTextActive: { color: colors.white },
   label: { color: colors.textSecondary, fontSize: 13 },
   input: {
-    backgroundColor: colors.surfaceElevated,
+    backgroundColor: 'rgba(0,0,0,0.35)',
     borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: colors.glassBorder,
     color: colors.text,
     paddingHorizontal: spacing.md,
     paddingVertical: 12,

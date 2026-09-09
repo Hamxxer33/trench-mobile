@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { colors, radius, spacing, typography } from '@/theme';
+import { colors, radius, spacing, tabBar, typography } from '@/theme';
 
 /** Live tab — stub only. No livestream UI in V1. */
 export default function LiveScreen() {
@@ -26,6 +26,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing.lg,
+    paddingBottom: tabBar.contentInset,
     gap: spacing.sm,
   },
   badge: {
