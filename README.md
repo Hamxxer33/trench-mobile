@@ -97,6 +97,14 @@ eas.json       # preview / production build profiles
 - Privy login mock · fee chrome
 - Groups V1.2 mocks (no real messaging / group-buy)
 
+## Play listing assets
+
+Figma pack lives in the research repo (not committed here as binaries):
+
+- Spec: `trench-research/design/play-listing-assets.md`
+- Comps: `trench-research/design/comps/` — `trench-play-icon.png` (512²), `trench-play-feature.png` (~1024×500), plus phone shots (Login → Feed → Coin → Create → Portfolio → Wallet → Settings/Legal; P1 Groups)
+- Package: `fun.trench.app` · closed test only · “built on Base” · no earnings glamor
+
 ## Notes
 
 - Do not commit secrets.

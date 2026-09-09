@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { GlassSurface } from '@/components/GlassSurface';
 import { TrenchBaseLockup } from '@/components/TrenchBaseLockup';
-import { getAllGroups, type MockGroup } from '@/data/mocks/groups';
+import { formatMemberCount, getAllGroups, type MockGroup } from '@/data/mocks/groups';
 import { getLaunchById } from '@/data/mocks/launches';
 import { colors, radius, spacing, tabBar, typography } from '@/theme';
 
@@ -73,7 +73,7 @@ function GroupRow({ group }: { group: MockGroup }) {
               )}
             </View>
             <Text style={styles.sub} numberOfLines={1}>
-              {group.memberCount} members · {ticker}
+              {formatMemberCount(group.memberCount)} members · {ticker}
             </Text>
           </View>
         </GlassSurface>

@@ -3,7 +3,7 @@ import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useWallet } from '@/components/WalletContext';
-import { getGroupByInviteCode, inviteUrl } from '@/data/mocks/groups';
+import { formatMemberCount, getGroupByInviteCode, inviteUrl } from '@/data/mocks/groups';
 import { getLaunchById } from '@/data/mocks/launches';
 import { colors, radius, spacing, typography } from '@/theme';
 
@@ -51,7 +51,7 @@ export default function InviteJoinScreen() {
         <Text style={styles.title}>{group.name}</Text>
         <Text style={styles.sub}>{group.description}</Text>
         <Text style={styles.meta}>
-          {group.memberCount} members
+          {formatMemberCount(group.memberCount)} members
           {token ? ` · $${token.symbol}` : ' · No token yet'}
         </Text>
         <Text style={styles.link}>{inviteUrl(group.inviteCode)}</Text>

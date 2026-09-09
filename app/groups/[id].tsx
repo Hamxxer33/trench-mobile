@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   appendLocalMessage,
   getGroupById,
+  formatMemberCount,
   inviteUrl,
   type MockGroupMessage,
 } from '@/data/mocks/groups';
@@ -81,7 +82,7 @@ export default function GroupThreadScreen() {
 
       <View style={styles.headerMeta}>
         <Text style={styles.meta}>
-          {group.memberCount} members · {inviteUrl(group.inviteCode)}
+          {formatMemberCount(group.memberCount)} members · {inviteUrl(group.inviteCode)}
         </Text>
       </View>
 

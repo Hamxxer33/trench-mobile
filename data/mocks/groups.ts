@@ -73,7 +73,7 @@ export const MOCK_GROUPS: MockGroup[] = [
     name: 'Ape Den',
     description: 'TAPE holders hanging before the next drop.',
     avatarEmoji: '🦍',
-    memberCount: 58,
+    memberCount: 142,
     tokenId: 'trench-ape',
     inviteCode: 'APED',
     unread: 0,
@@ -163,6 +163,11 @@ export function getGroupForLaunch(launchId: string): MockGroup | undefined {
 
 export function inviteUrl(code: string): string {
   return `trench.app/g/${code.toUpperCase()}`;
+}
+
+/** Thread/list header — cap display at 99+. */
+export function formatMemberCount(n: number): string {
+  return n > 99 ? '99+' : String(n);
 }
 
 export type CreateGroupInput = {
